@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartRx - Trợ Lý Sức Khỏe</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 flex flex-col items-center">
+
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 min-h-[90vh] flex flex-col">
+        <header class="mb-6">
+            <h1 class="text-2xl font-black text-blue-600">SmartRx</h1>
+            <p class="text-xs text-slate-500">Người đồng hành cùng sức khỏe gia đình</p>
+        </header>
+
+        <!-- Khu vực Demo -->
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl mb-6">
+            <p class="text-xs font-bold text-amber-900 mb-2 uppercase tracking-widest">Chế độ Demo</p>
+            <button onclick="triggerDemo()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition">
+                Nhắc thuốc mẫu
+            </button>
+        </div>
+
+        <div id="medicine-list" class="flex-1 space-y-3">
+            <!-- Danh sách thuốc sẽ được load từ localStorage -->
+        </div>
+    </div>
+
+    <!-- Thông báo Bottom Sheet (Không chặn màn hình) -->
+    <div id="soft-reminder" class="hidden fixed bottom-0 left-0 right-0 z-[100] p-4 animate-slideUp">
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 w-full max-w-md mx-auto">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="bg-blue-100 p-3 rounded-2xl text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Đến giờ uống thuốc</p>
+                    <h3 id="remind-name" class="font-bold text-slate-800">Paracetamol 500mg</h3>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="hideReminder()" class="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-sm">Nhắc lại</button>
+                <button onclick="hideReminder()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold text-sm">Đã uống</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tải danh sách thuốc khi mở trang
+        window.onload = () => {
+            const savedMeds = JSON.parse(localStorage.getItem('my_meds') || '[]');
+            renderMeds(savedMeds);
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        };
+
+        function triggerDemo() {
+            document.getElementById('remind-name').innerText = "Paracetamol 500mg";
+            document.getElementById('soft-reminder').classList.remove('hidden');
+        }
+
+        function hideReminder() {
+            document.getElementById('soft-reminder').classList.add('hidden');
+        }
+
+        function renderMeds(meds) {
+            const list = document.getElementById('medicine-list');
+            list.innerHTML = meds.map(m => `<div class="p-4 bg-slate-50 rounded-xl font-bold text-slate-700">${m}</div>`).join('');
+        }
+    </script>
+</body>
+</html>
